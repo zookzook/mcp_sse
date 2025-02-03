@@ -1,6 +1,8 @@
 defmodule MCPSse.Example.Server do
   @moduledoc """
   A simple example server that demonstrates the SSE functionality.
+
+  This is just a simple Plug-based server to help test and verify the :mcp_sse library.
   """
   use Plug.Router
 

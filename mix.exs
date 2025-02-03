@@ -15,7 +15,7 @@ defmodule MCPSse.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {MCPSse.Application, []}
+      mod: {MCP.SSE, []}
     ]
   end
 

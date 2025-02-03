@@ -2,8 +2,22 @@
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `mcp_sse` to your list of dependencies in `mix.exs`:
+### For Phoenix Applications:
+
+1. Add the required configuration to `config/config.exs`:
+
+```elixir
+# Configure MIME types for SSE
+config :mime, :types, %{
+  "text/event-stream" => ["sse"]
+}
+
+# Configure the MCP Server
+config :nws_mcp_server, :mcp_server, MCP.DefaultServer
+# config :nws_mcp_server, :mcp_server, YourApp.YourMCPServer
+```
+
+2. Add to your dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -13,11 +27,100 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/mcp_sse>.
+3. Configure your router (`lib/your_app_web/router.ex`):
 
-## Quick Demo
+```elixir
+pipeline :sse do
+  plug :accepts, ["sse"]
+end
+
+scope "/" do
+  pipe_through :sse
+  get "/sse", SSE.ConnectionPlug, :call
+  
+  pipe_through :api
+  post "/message", SSE.ConnectionPlug, :call
+end
+```
+
+### For Plug Applications:
+
+1. Add the required configuration to `config/config.exs`:
+
+```elixir
+# Configure MIME types for SSE
+config :mime, :types, %{
+  "text/event-stream" => ["sse"]
+}
+
+# Configure the MCP Server
+config :your_app, :mcp_server, YourApp.YourMCPServer
+```
+
+2. Add to your dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:mcp_sse, git: "https://github.com/kend/mcp_sse", override: true},
+    {:plug_cowboy, "~> 2.6"}
+  ]
+end
+```
+
+3. Configure your router (`lib/your_app/router.ex`):
+
+```elixir
+defmodule YourApp.Router do
+  use Plug.Router
+  
+  plug :match
+  plug :dispatch
+
+  forward "/sse", to: SSE.ConnectionPlug
+  forward "/message", to: SSE.ConnectionPlug
+
+  match _ do
+    send_resp(conn, 404, "Not found")
+  end
+end
+```
+
+Then update your config to use your implementation:
+
+```elixir
+config :nws_mcp_server, :mcp_server, YourApp.YourMCPServer
+```
+
+The `use MCPServer` macro provides:
+- Built-in message routing
+- Protocol version validation
+- Default implementations for optional callbacks
+- JSON-RPC error handling
+- Logging
+
+You only need to implement the required callbacks (`handle_ping/1` and `handle_initialize/2`) and any optional callbacks for features you want to support.
+
+### Protocol Documentation
+
+For detailed information about the Model Context Protocol, visit:
+[Model Context Protocol Documentation](https://github.com/cursor-ai/model-context-protocol)
+
+### Features
+
+- Full MCP server implementation
+- SSE connection management
+- JSON-RPC message handling
+- Tool registration and execution
+- Session management
+- Automatic ping/keepalive
+- Error handling and validation
+
+## Contributing
+
+...
+
+### Quick Demo
 
 To see the MCP server in action:
 
@@ -40,203 +143,9 @@ The client script will:
 
 This provides a practical demonstration of the MCP protocol flow and server capabilities.
 
-## Installation
+## Other Notes
 
-To use these modules in your Phoenix or Plug-based application:
-
-1. Copy the following directories to your project:
-   - `lib/mcp` - Core MCP implementation
-   - `lib/sse` - SSE connection handling
-
-2. Add required dependencies to your `mix.exs`:
-```elixir
-def deps do
-  [
-    {:jason, "~> 1.2"},       # JSON encoding/decoding
-    {:plug, "~> 1.14"},       # If not using Phoenix
-    {:phoenix, "~> 1.7.18"}   # If using Phoenix
-  ]
-end
-```
-
-## Configuration
-
-1. Configure MIME types for SSE in `config/config.exs`:
-```elixir
-config :mime, :types, %{
-  "text/event-stream" => ["sse"]
-}
-```
-
-2. Set up the SSE connection registry in your application.ex:
-```elixir
-def start(_type, _args) do
-  children = [
-    # ... other children ...
-    SSE.ConnectionRegistry,  # This will handle the ETS table creation
-    # ... rest of your supervision tree
-  ]
-  
-  opts = [strategy: :one_for_one, name: YourApp.Supervisor]
-  Supervisor.start_link(children, opts)
-end
-```
-
-3. Configure your router:
-
-For Phoenix:
-```elixir
-pipeline :sse do
-  plug :accepts, ["sse"]
-end
-
-scope "/" do
-  pipe_through :sse
-  get "/sse", SSE.ConnectionPlug, :call
-  
-  pipe_through :api
-  post "/message", SSE.ConnectionPlug, :call
-end
-```
-
-For Plug:
-```elixir
-forward "/sse", to: SSE.ConnectionPlug
-forward "/message", to: SSE.ConnectionPlug
-```
-
-## Implementing Your MCP Server
-
-1. Create a module using the `MCPServer` behaviour:
-
-```elixir
-defmodule YourApp.Server do
-  use MCPServer
-
-  @impl true
-  def handle_ping(request_id) do
-    {:ok,
-     %{
-       jsonrpc: "2.0",
-       id: request_id,
-       result: "pong"
-     }}
-  end
-
-  @impl true
-  def handle_initialize(request_id, params) do
-    case validate_protocol_version(params["protocolVersion"]) do
-      :ok ->
-        {:ok,
-         %{
-           jsonrpc: "2.0",
-           id: request_id,
-           result: %{
-             protocolVersion: "2024-11-05",
-             capabilities: %{
-               tools: %{
-                 listChanged: true
-               }
-             },
-             serverInfo: %{
-               name: "Your MCP Server",
-               version: "0.1.0"
-             }
-           }
-         }}
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
-
-  @impl true
-  def handle_list_tools(request_id, _params) do
-    {:ok,
-     %{
-       jsonrpc: "2.0",
-       id: request_id,
-       result: %{
-         tools: [
-           # Define your tools here
-           %{
-             name: "your_tool",
-             description: "Your tool description",
-             inputSchema: %{
-               type: "object",
-               required: ["input"],
-               properties: %{
-                 input: %{
-                   type: "string",
-                   description: "Input description"
-                 }
-               }
-             },
-             outputSchema: %{
-               type: "object",
-               required: ["output"],
-               properties: %{
-                 output: %{
-                   type: "string",
-                   description: "Output description"
-                 }
-               }
-             }
-           }
-         ]
-       }
-     }}
-  end
-
-  @impl true
-  def handle_call_tool(request_id, %{"name" => "example", "arguments" => %{"input" => input}}) do
-    {:ok,
-     %{
-       jsonrpc: "2.0",
-       id: request_id,
-       result: %{
-         content: [
-           %{
-             type: "text",
-             text: "Processed: #{input}"
-           }
-         ]
-       }
-     }}
-  end
-end
-```
-
-2. Configure your server implementation in `config/config.exs`:
-```elixir
-config :your_app, :mcp_server, YourApp.Server
-```
-
-The `use MCPServer` macro provides:
-- Built-in message routing
-- Protocol version validation
-- Default implementations for optional callbacks
-- JSON-RPC error handling
-- Logging
-
-You only need to implement the required callbacks (`handle_ping/1` and `handle_initialize/2`) and any optional callbacks for features you want to support.
-
-## Protocol Documentation
-
-For detailed information about the Model Context Protocol, visit:
-[Model Context Protocol Documentation](https://github.com/cursor-ai/model-context-protocol)
-
-## Features
-
-- Full MCP server implementation
-- SSE connection management
-- JSON-RPC message handling
-- Tool registration and execution
-- Session management
-- Automatic ping/keepalive
-- Error handling and validation
-
-## Example Client Usage
+### Example Client Usage
 
 ```javascript
 // Connect to SSE endpoint
@@ -264,3 +173,8 @@ fetch('/message?sessionId=YOUR_SESSION_ID', {
 });
 ```
 
+### Pending Tasks
+
+Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
+and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
+be found at <https://hexdocs.pm/mcp_sse>.

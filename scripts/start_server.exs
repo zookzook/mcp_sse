@@ -1,5 +1,5 @@
 # Start the MCPSse application
-{:ok, _} = MCPSse.start()
+{:ok, _} = MCP.SSE.start()
 
 # Create a supervision tree for our example server
 children = [
