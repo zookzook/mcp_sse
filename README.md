@@ -1,5 +1,10 @@
 # MCP over SSE
 
+This library provides a simple implementation of the Model Context Protocol (MCP) over Server-Sent Events (SSE).
+
+For more information about the Model Context Protocol, visit:
+[Model Context Protocol Documentation](https://modelcontextprotocol.io/introduction)
+
 ## Installation
 
 ### For Phoenix Applications:
@@ -67,7 +72,7 @@ config :your_app, :mcp_server, YourApp.MCPServer
 ```elixir
 def deps do
   [
-    {:mcp_sse, git: "https://github.com/kend/mcp_sse", override: true},
+    {:mcp_sse, "~> 0.1.0"},
     {:plug, "~> 1.14"},
     {:bandit, "~> 1.2"}
   ]
@@ -240,9 +245,3 @@ fetch('/message?sessionId=YOUR_SESSION_ID', {
   })
 });
 ```
-
-### Pending Tasks
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/mcp_sse>.
