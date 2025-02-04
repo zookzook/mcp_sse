@@ -1,11 +1,13 @@
 defmodule MCP.MessageRouter do
-  @moduledoc """
-  Routes MCP JSON-RPC messages to appropriate server implementations.
-  Provides default handling for basic messages like ping.
-  """
+  @moduledoc false
+
+  # Internal routing implementation
+  # Routes MCP JSON-RPC messages to appropriate server implementations.
+  # Provides default handling for basic messages like ping.
 
   require Logger
 
+  @doc false
   def handle_message(%{"method" => "notifications/initialized"} = message) do
     Logger.info("Received initialized notification")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
@@ -13,6 +15,7 @@ defmodule MCP.MessageRouter do
     {:ok, nil}
   end
 
+  @doc false
   def handle_message(%{"method" => method, "id" => id} = message) do
     server_implementation = Application.get_env(:sse_demo, :mcp_server, MCP.DefaultServer)
     Logger.info("Routing MCP message - Method: #{method}, ID: #{id}")
@@ -59,6 +62,7 @@ defmodule MCP.MessageRouter do
     end
   end
 
+  @doc false
   def handle_message(unknown_message) do
     Logger.error("Received invalid message format: #{inspect(unknown_message, pretty: true)}")
 

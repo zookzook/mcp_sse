@@ -1,8 +1,8 @@
 defmodule MCP.DefaultServer do
-  @moduledoc """
-  Default implementation of MCP Server Behaviour.
-  Provides basic functionality and stubs for optional callbacks.
-  """
+  @moduledoc false
+
+  # Default implementation of MCP Server Behaviour.
+  # Provides basic functionality and stubs for optional callbacks.
   use MCPServer
 
   require Logger

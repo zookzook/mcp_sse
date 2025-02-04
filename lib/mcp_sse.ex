@@ -1,8 +1,6 @@
 defmodule MCP.SSE do
-  @moduledoc """
-  Main entry point for the MCPSse library.
-  Provides the OTP Application behaviour.
-  """
+  @moduledoc false
+
   use Application
 
   @impl true
@@ -22,9 +20,9 @@ defmodule MCP.SSE do
   end
 
   @doc """
-  Starts the MCPSse supervision tree.
+  Starts the MCP.SSE supervision tree.
   This is useful for testing and development.
-  In production, you should add MCPSse to your application's dependencies.
+  In production, you should add MCP.SSE to your application's dependencies.
   """
   def start do
     Application.ensure_all_started(:mcp_sse)

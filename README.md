@@ -43,39 +43,72 @@ scope "/" do
 end
 ```
 
-### For Plug Applications:
+### For Plug Applications with Bandit:
 
-1. Add the required configuration to `config/config.exs`:
+1. Create a new Plug application with supervision:
+```bash
+mix new your_app --sup
+```
 
+2. Add the required configuration to `config/config.exs`:
 ```elixir
+import Config
+
 # Configure MIME types for SSE
 config :mime, :types, %{
   "text/event-stream" => ["sse"]
 }
 
 # Configure the MCP Server
-config :your_app, :mcp_server, YourApp.YourMCPServer
+config :your_app, :mcp_server, YourApp.MCPServer
 ```
 
-2. Add to your dependencies in `mix.exs`:
-
+3. Add dependencies to `mix.exs`:
 ```elixir
 def deps do
   [
     {:mcp_sse, git: "https://github.com/kend/mcp_sse", override: true},
-    {:plug_cowboy, "~> 2.6"}
+    {:plug, "~> 1.14"},
+    {:bandit, "~> 1.2"}
   ]
 end
 ```
 
-3. Configure your router (`lib/your_app/router.ex`):
-
+4. Configure your router (`lib/your_app/router.ex`):
 ```elixir
 defmodule YourApp.Router do
   use Plug.Router
   
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :json],
+    pass: ["text/*"],
+    json_decoder: Jason
+
   plug :match
+  plug :ensure_session_id
   plug :dispatch
+
+  # Middleware to ensure session ID exists
+  def ensure_session_id(conn, _opts) do
+    case get_session_id(conn) do
+      nil ->
+        # Generate a new session ID if none exists
+        session_id = generate_session_id()
+        %{conn | query_params: Map.put(conn.query_params, "sessionId", session_id)}
+      _session_id ->
+        conn
+    end
+  end
+
+  # Helper to get session ID from query params
+  defp get_session_id(conn) do
+    conn.query_params["sessionId"]
+  end
+
+  # Generate a unique session ID
+  defp generate_session_id do
+    Base.encode16(:crypto.strong_rand_bytes(8), case: :lower)
+  end
 
   forward "/sse", to: SSE.ConnectionPlug
   forward "/message", to: SSE.ConnectionPlug
@@ -86,10 +119,45 @@ defmodule YourApp.Router do
 end
 ```
 
-Then update your config to use your implementation:
+5. Set up your application supervision (`lib/your_app/application.ex`):
+```elixir
+defmodule YourApp.Application do
+  use Application
+
+  @impl true
+  def start(_type, _args) do
+    children = [
+      {Bandit, plug: YourApp.Router, port: 4000}
+    ]
+
+    opts = [strategy: :one_for_one, name: YourApp.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
+end
+```
+
+### Session Management
+
+The MCP SSE server requires a session ID for each connection. The router automatically:
+- Uses an existing session ID from query parameters if provided
+- Generates a new session ID if none exists
+- Ensures all requests to `/sse` and `/message` endpoints have a valid session ID
+
+### Configuration Options
+
+The Bandit server can be configured with additional options in your application module:
 
 ```elixir
-config :nws_mcp_server, :mcp_server, YourApp.YourMCPServer
+# Example with custom port and HTTPS
+children = [
+  {Bandit,
+    plug: YourApp.Router,
+    port: System.get_env("PORT", "4000") |> String.to_integer(),
+    scheme: :https,
+    certfile: "priv/cert/selfsigned.pem",
+    keyfile: "priv/cert/selfsigned_key.pem"
+  }
+]
 ```
 
 The `use MCPServer` macro provides:

@@ -1,7 +1,7 @@
 defmodule SSE.ConnectionState do
-  @moduledoc """
-  Tracks the state of MCP connections
-  """
+  @moduledoc false
+  # Internal state management for SSE connections
+
   use GenServer
   require Logger
 
@@ -13,10 +13,12 @@ defmodule SSE.ConnectionState do
   # State transitions
   # :connected -> :initialized -> :ready
 
+  @doc false
   def start_link(session_id) do
     GenServer.start_link(__MODULE__, session_id)
   end
 
+  @doc false
   @impl true
   def init(session_id) do
     # Start initialization timeout
@@ -36,26 +38,32 @@ defmodule SSE.ConnectionState do
      }}
   end
 
+  @doc false
   def handle_initialize(pid) do
     GenServer.call(pid, :handle_initialize)
   end
 
+  @doc false
   def handle_initialized(pid) do
     GenServer.call(pid, :handle_initialized)
   end
 
+  @doc false
   def ready?(pid) do
     GenServer.call(pid, :ready?)
   end
 
+  @doc false
   def record_activity(pid) do
     GenServer.call(pid, :record_activity)
   end
 
+  @doc false
   def check_activity_timeout(pid) do
     GenServer.call(pid, :check_activity_timeout)
   end
 
+  @doc false
   def set_sse_pid(pid, sse_pid) do
     GenServer.call(pid, {:set_sse_pid, sse_pid})
   end

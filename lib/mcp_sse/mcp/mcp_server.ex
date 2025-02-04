@@ -1,33 +1,26 @@
 defmodule MCPServer do
   @moduledoc """
-  Behaviour definition for MCP servers.
-  Implements required message handlers based on the MCP specification.
+  Behaviour definition for implementing MCP (Model Context Protocol) servers.
+  Provides a standardized interface for handling MCP protocol messages and tools.
 
-  ## Usage
+  ## Example
 
-  ```elixir
-  defmodule MyApp.Server do
-    use MCPServer
+      defmodule MyApp.Server do
+        use MCPServer
 
-    # Implement required callbacks
-    @impl true
-    def handle_ping(request_id) do
-      {:ok, %{jsonrpc: "2.0", id: request_id, result: "pong"}}
-    end
+        @impl true
+        def handle_ping(request_id) do
+          {:ok, %{jsonrpc: "2.0", id: request_id, result: "pong"}}
+        end
 
-    @impl true
-    def handle_initialize(request_id, params) do
-      # Your initialization logic
-    end
+        @impl true
+        def handle_initialize(request_id, params) do
+          # Your initialization logic
+        end
 
-    # Optionally implement other callbacks
-    @impl true
-    def handle_list_tools(request_id, _params) do
-      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{tools: []}}}
-    end
-  end
-  ```
 
+        ... implementations of handle_list_tools, handle_call_tools, etc.
+      end
   """
 
   @protocol_version "2024-11-05"
@@ -141,57 +134,31 @@ defmodule MCPServer do
     end
   end
 
-  @doc """
-  Handle ping request
-  """
+  # Required Callbacks
   @callback handle_ping(request_id :: String.t() | integer()) ::
               {:ok, map()} | {:error, String.t()}
-
-  @doc """
-  Handle initialization request with client capabilities
-  """
   @callback handle_initialize(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 
-  @doc """
-  Handle completion request for prompts or resources
-  """
+  # Optional Callbacks
   @callback handle_complete(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 
-  @doc """
-  Handle request to list available prompts
-  """
   @callback handle_list_prompts(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 
-  @doc """
-  Handle request to get a specific prompt
-  """
   @callback handle_get_prompt(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 
-  @doc """
-  Handle request to list available resources
-  """
   @callback handle_list_resources(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 
-  @doc """
-  Handle request to read a specific resource
-  """
   @callback handle_read_resource(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 
-  @doc """
-  Handle request to list available tools
-  """
   @callback handle_list_tools(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 
-  @doc """
-  Handle request to call a specific tool
-  """
   @callback handle_call_tool(request_id :: String.t() | integer(), params :: map()) ::
               {:ok, map()} | {:error, String.t()}
 

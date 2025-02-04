@@ -1,7 +1,34 @@
 defmodule SSE.ConnectionPlug do
   @moduledoc """
-  Handles Server-Sent Events (SSE) connections and message routing.
+  A Plug for handling Server-Sent Events (SSE) connections with MCP protocol support.
+
+  Query params:
+    * `sessionId` - The session ID for the connection
+
+  This plug provides two endpoints:
+    * `/sse` - Establishes the SSE connection
+    * `/message` - Handles JSON-RPC messages for the MCP protocol
+
+  ## Usage in Phoenix Router
+
+      pipeline :sse do
+        plug :accepts, ["sse"]
+      end
+
+      scope "/" do
+        pipe_through :sse
+        get "/sse", SSE.ConnectionPlug, :call
+
+        pipe_through :api
+        post "/message", SSE.ConnectionPlug, :call
+      end
+
+  ## Usage in Plug Router
+
+      forward "/sse", to: SSE.ConnectionPlug
+      forward "/message", to: SSE.ConnectionPlug
   """
+
   import Plug.Conn
   require Logger
 
@@ -11,28 +38,30 @@ defmodule SSE.ConnectionPlug do
 
   @sse_keepalive_timeout 15_000
 
+  # Standard Plug callback
+  @doc false
   def init(opts), do: opts
 
+  # Standard Plug callback
+  @doc false
   def call(%Plug.Conn{request_path: "/sse"} = conn, _opts) do
     handle_sse(conn)
   end
 
+  # Standard Plug callback
+  @doc false
   def call(%Plug.Conn{request_path: "/message"} = conn, _opts) do
     handle_message(conn)
   end
 
   def call(conn, _opts), do: conn
 
-  # Private functions remain mostly the same, but replace Phoenix.Controller functions:
-
-  # Instead of json/2, use:
   defp send_json(conn, data) do
     conn
     |> put_resp_content_type("application/json")
     |> send_resp(conn.status || 200, Jason.encode!(data))
   end
 
-  # Instead of put_status/2 and json/2:
   defp send_error(conn, status, message) do
     conn
     |> put_resp_content_type("application/json")
