@@ -17,7 +17,7 @@ defmodule MCP.MessageRouter do
 
   @doc false
   def handle_message(%{"method" => method, "id" => id} = message) do
-    server_implementation = Application.get_env(:sse_demo, :mcp_server, MCP.DefaultServer)
+    server_implementation = Application.get_env(:mcp_sse, :mcp_server, MCP.DefaultServer)
     Logger.info("Routing MCP message - Method: #{method}, ID: #{id}")
     Logger.debug("Full message: #{inspect(message, pretty: true)}")
 

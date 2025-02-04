@@ -31,11 +31,11 @@ defmodule MCP.MessageRouterTest do
 
   setup do
     # Configure the mock server for testing
-    Application.put_env(:sse_demo, :mcp_server, MockMCPServer)
+    Application.put_env(:mcp_sse, :mcp_server, MockMCPServer)
 
     on_exit(fn ->
       # Reset the configuration after each test
-      Application.delete_env(:sse_demo, :mcp_server)
+      Application.delete_env(:mcp_sse, :mcp_server)
     end)
   end
 
