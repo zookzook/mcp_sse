@@ -7,7 +7,8 @@ defmodule MCPSse.MixProject do
       version: "0.1.0",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env())
     ]
   end
 
@@ -28,4 +29,8 @@ defmodule MCPSse.MixProject do
       {:plug_cowboy, "~> 2.6", only: :test}
     ]
   end
+
+  # Specify which paths to compile per environment
+  defp elixirc_paths(:dev), do: ["lib", "dev"]
+  defp elixirc_paths(_), do: ["lib"]
 end
