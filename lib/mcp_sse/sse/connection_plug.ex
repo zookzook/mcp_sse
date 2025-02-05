@@ -272,12 +272,30 @@ defmodule SSE.ConnectionPlug do
   defp handle_client_disconnect(session_id) do
     Logger.info("SSE connection cancelled")
     Logger.info("Cleaning up SSE connection")
+
+    case lookup_session(session_id) do
+      {:ok, {_sse_pid, state_pid}} ->
+        ConnectionState.cleanup(state_pid)
+
+      _ ->
+        :ok
+    end
+
     :ets.delete(ConnectionRegistry.table_name(), session_id)
     Logger.info("SSE connection closed for session #{session_id}")
   end
 
   defp close_connection(conn, session_id, reason) do
     Logger.info("Closing SSE connection. Session ID: #{session_id}, Reason: #{reason}")
+
+    case lookup_session(session_id) do
+      {:ok, {_sse_pid, state_pid}} ->
+        ConnectionState.cleanup(state_pid)
+
+      _ ->
+        :ok
+    end
+
     :ets.delete(ConnectionRegistry.table_name(), session_id)
 
     case chunk(conn, "event: close\ndata: #{reason}\n\n") do
