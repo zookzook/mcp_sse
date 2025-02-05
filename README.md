@@ -245,3 +245,18 @@ fetch('/message?sessionId=YOUR_SESSION_ID', {
   })
 });
 ```
+
+### SSE Keepalive
+
+The SSE connection sends periodic keepalive pings to prevent connection timeouts. 
+You can configure the ping interval or disable it entirely:
+
+```elixir
+# In config/config.exs
+
+# Set custom ping interval (in milliseconds)
+config :mcp_sse, :sse_keepalive_timeout, 30_000  # 30 seconds
+
+# Or disable pings entirely
+config :mcp_sse, :sse_keepalive_timeout, :infinity
+```

@@ -36,7 +36,7 @@ defmodule SSE.ConnectionPlug do
   alias SSE.ConnectionRegistry
   alias SSE.ConnectionState
 
-  @sse_keepalive_timeout 15_000
+  @sse_keepalive_timeout Application.compile_env(:mcp_sse, :sse_keepalive_timeout, 15_000)
 
   # Standard Plug callback
   @doc false
@@ -243,7 +243,14 @@ defmodule SSE.ConnectionPlug do
   end
 
   defp schedule_next_ping(sse_pid) do
-    Process.send_after(sse_pid, :send_ping, @sse_keepalive_timeout)
+    case @sse_keepalive_timeout do
+      # Don't schedule next ping if disabled
+      :infinity ->
+        :ok
+
+      timeout when is_integer(timeout) ->
+        Process.send_after(sse_pid, :send_ping, timeout)
+    end
   end
 
   defp handle_sse_message(conn, _session_id, _state_pid, msg) do
