@@ -260,3 +260,83 @@ config :mcp_sse, :sse_keepalive_timeout, 30_000  # 30 seconds
 # Or disable pings entirely
 config :mcp_sse, :sse_keepalive_timeout, :infinity
 ```
+
+### MCP Response Formatting
+
+When implementing tool responses in your MCP server, the content must follow the MCP specification for content types.
+The response content should be formatted as one of these types:
+
+```elixir
+# Text content
+{:ok,
+ %{
+   jsonrpc: "2.0",
+   id: request_id,
+   result: %{
+     content: [
+       %{
+         type: "text",
+         text: "Your text response here"
+       }
+     ]
+   }
+ }}
+
+# Image content
+{:ok,
+ %{
+   jsonrpc: "2.0",
+   id: request_id,
+   result: %{
+     content: [
+       %{
+         type: "image",
+         data: "base64_encoded_image_data",
+         mimeType: "image/png"
+       }
+     ]
+   }
+ }}
+
+# Resource reference
+{:ok,
+ %{
+   jsonrpc: "2.0",
+   id: request_id,
+   result: %{
+     content: [
+       %{
+         type: "resource",
+         resource: %{
+           name: "resource_name",
+           description: "resource description"
+         }
+       }
+     ]
+   }
+ }}
+```
+
+For structured data like JSON, you should convert it to a formatted string:
+
+```elixir
+def handle_call_tool(request_id, %{"name" => "list_companies"} = _params) do
+  companies = fetch_companies()  # Your data fetching logic
+
+  {:ok,
+   %{
+     jsonrpc: "2.0",
+     id: request_id,
+     result: %{
+       content: [
+         %{
+           type: "text",
+           text: Jason.encode!(companies, pretty: true)
+         }
+       ]
+     }
+   }}
+end
+```
+
+For more details on response formatting, see the [MCP Content Types Specification](https://spec.modelcontextprotocol.io/specification/2024-11-05/basic/messages/#responses).
