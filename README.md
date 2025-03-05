@@ -65,7 +65,7 @@ config :mime, :types, %{
 }
 
 # Configure the MCP Server
-config :your_app, :mcp_server, YourApp.MCPServer
+config :mcp_sse, :mcp_server, YourApp.MCPServer
 ```
 
 3. Add dependencies to `mix.exs`:
