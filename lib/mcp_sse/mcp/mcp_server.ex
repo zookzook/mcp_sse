@@ -13,7 +13,7 @@ defmodule MCPServer do
 
         @impl true
         def handle_ping(request_id) do
-          {:ok, %{jsonrpc: "2.0", id: request_id, result: "pong"}}
+          {:ok, %{jsonrpc: "2.0", id: request_id, result: %{}}}
         end
 
         @impl true
