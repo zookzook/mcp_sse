@@ -13,7 +13,7 @@ defmodule MCP.DefaultServerTest do
       assert {:ok, response} = DefaultServer.handle_ping(request_id)
       assert response.jsonrpc == "2.0"
       assert response.id == request_id
-      assert response.result == "pong"
+      assert response.result == %{}
     end
   end
 
