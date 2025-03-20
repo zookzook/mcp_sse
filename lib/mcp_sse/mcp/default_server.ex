@@ -15,7 +15,7 @@ defmodule MCP.DefaultServer do
      %{
        jsonrpc: "2.0",
        id: request_id,
-       result: "pong"
+       result: %{}
      }}
   end
 

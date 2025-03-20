@@ -18,8 +18,8 @@ config :mime, :types, %{
 }
 
 # Configure the MCP Server
-config :nws_mcp_server, :mcp_server, MCP.DefaultServer
-# config :nws_mcp_server, :mcp_server, YourApp.YourMCPServer
+config :mcp_sse, :mcp_server, MCP.DefaultServer
+# config :mcp_sse, :mcp_server, YourApp.YourMCPServer
 ```
 
 2. Add to your dependencies in `mix.exs`:
@@ -42,7 +42,7 @@ end
 scope "/" do
   pipe_through :sse
   get "/sse", SSE.ConnectionPlug, :call
-  
+
   pipe_through :api
   post "/message", SSE.ConnectionPlug, :call
 end
@@ -83,7 +83,7 @@ end
 ```elixir
 defmodule YourApp.Router do
   use Plug.Router
-  
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :json],
     pass: ["text/*"],
@@ -248,7 +248,7 @@ fetch('/message?sessionId=YOUR_SESSION_ID', {
 
 ### SSE Keepalive
 
-The SSE connection sends periodic keepalive pings to prevent connection timeouts. 
+The SSE connection sends periodic keepalive pings to prevent connection timeouts.
 You can configure the ping interval or disable it entirely:
 
 ```elixir
