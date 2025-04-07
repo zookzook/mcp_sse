@@ -9,7 +9,7 @@ defmodule MCP.MessageRouterTest do
 
     @impl true
     def handle_ping(request_id) do
-      {:ok, %{jsonrpc: "2.0", id: request_id, result: "pong"}}
+      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{}}}
     end
 
     @impl true
@@ -19,13 +19,39 @@ defmodule MCP.MessageRouterTest do
     end
 
     @impl true
+    def handle_complete(request_id, _params) do
+      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{completion: %{}}}}
+    end
+
+    @impl true
+    def handle_list_prompts(request_id, _params) do
+      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{prompts: []}}}
+    end
+
+    @impl true
+    def handle_get_prompt(request_id, params) do
+      name = params["name"]
+      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{"description" => name}}}
+    end
+
+    @impl true
+    def handle_list_resources(request_id, _params) do
+      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{resources: []}}}
+    end
+
+    @impl true
+    def handle_read_resource(request_id, _params) do
+      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{contents: []}}}
+    end
+
+    @impl true
     def handle_list_tools(request_id, _params) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{tools: []}}}
     end
 
     @impl true
-    def handle_call_tool(request_id, params) do
-      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{tool_result: params["name"]}}}
+    def handle_call_tool(request_id, _params) do
+      {:ok, %{jsonrpc: "2.0", id: request_id, result: %{content: []}}}
     end
   end
 
@@ -58,7 +84,7 @@ defmodule MCP.MessageRouterTest do
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
       assert response.id == "123"
-      assert response.result == "pong"
+      assert response.result == %{}
     end
 
     test "handles initialize request" do
@@ -74,6 +100,75 @@ defmodule MCP.MessageRouterTest do
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
       assert response.id == "456"
       assert response.result["capabilities"]["version"] == "1.0"
+    end
+
+    test "handles completion/complete request" do
+      message = %{
+        "method" => "completion/complete",
+        "id" => "789",
+        "params" => %{},
+        "jsonrpc" => "2.0"
+      }
+
+      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert response.id == "789"
+      assert Map.has_key?(response.result, :completion)
+    end
+
+    test "handles prompts/list request" do
+      message = %{
+        "method" => "prompts/list",
+        "id" => "789",
+        "params" => %{},
+        "jsonrpc" => "2.0"
+      }
+
+      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert response.id == "789"
+      assert Map.has_key?(response.result, :prompts)
+    end
+
+    test "handles prompts/get request" do
+      message = %{
+        "method" => "prompts/get",
+        "id" => "789",
+        "params" => %{
+          "name" => "test_prompt"
+        },
+        "jsonrpc" => "2.0"
+      }
+
+      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert response.id == "789"
+      assert response.result["description"] == "test_prompt"
+    end
+
+    test "handles resources/list request" do
+      message = %{
+        "method" => "resources/list",
+        "id" => "789",
+        "params" => %{},
+        "jsonrpc" => "2.0"
+      }
+
+      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert response.id == "789"
+      assert Map.has_key?(response.result, :resources)
+    end
+
+    test "handles resources/read request" do
+      message = %{
+        "method" => "resources/read",
+        "id" => "789",
+        "params" => %{
+          "name" => "test_resource"
+        },
+        "jsonrpc" => "2.0"
+      }
+
+      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert response.id == "789"
+      assert Map.has_key?(response.result, :contents)
     end
 
     test "handles tools/list request" do
@@ -101,7 +196,7 @@ defmodule MCP.MessageRouterTest do
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
       assert response.id == "101"
-      assert response.result.tool_result == "test_tool"
+      assert Map.has_key?(response.result, :content)
     end
 
     test "returns method not found error for unsupported method" do

@@ -152,6 +152,35 @@ defmodule MCPServer do
 
             handle_initialize(id, message["params"])
 
+          "completion/complete" ->
+            Logger.debug(
+              "Handling complete request with params: #{inspect(message["params"], pretty: true)}"
+            )
+
+            handle_complete(id, message["params"])
+
+          "prompts/list" ->
+            Logger.debug("Handling prompts list request")
+            handle_list_prompts(id, message["params"])
+
+          "prompts/get" ->
+            Logger.debug(
+              "Handling prompt get request with params: #{inspect(message["params"], pretty: true)}"
+            )
+
+            handle_get_prompt(id, message["params"])
+
+          "resources/list" ->
+            Logger.debug("Handling resources list request")
+            handle_list_resources(id, message["params"])
+
+          "resources/read" ->
+            Logger.debug(
+              "Handling resource read request with params: #{inspect(message["params"], pretty: true)}"
+            )
+
+            handle_read_resource(id, message["params"])
+
           "tools/list" ->
             Logger.debug("Handling tools list request")
             handle_list_tools(id, message["params"])
