@@ -17,8 +17,8 @@ defmodule MCPServerTest do
 
     # Optional callbacks implementation for testing
     @impl true
-    def handle_complete(request_id, params) do
-      {:ok, %{request_id: request_id, type: "completion", result: params.prompt}}
+    def handle_complete(request_id, _params) do
+      {:ok, %{request_id: request_id, type: "completion", completion: %{}}}
     end
 
     @impl true
@@ -28,7 +28,7 @@ defmodule MCPServerTest do
 
     @impl true
     def handle_get_prompt(request_id, params) do
-      {:ok, %{request_id: request_id, type: "get_prompt", prompt: params.prompt_id}}
+      {:ok, %{request_id: request_id, type: "get_prompt", description: params.name}}
     end
 
     @impl true
@@ -37,8 +37,8 @@ defmodule MCPServerTest do
     end
 
     @impl true
-    def handle_read_resource(request_id, params) do
-      {:ok, %{request_id: request_id, type: "read_resource", resource: params.resource_id}}
+    def handle_read_resource(request_id, _params) do
+      {:ok, %{request_id: request_id, type: "read_resource", contents: []}}
     end
 
     @impl true
@@ -47,8 +47,8 @@ defmodule MCPServerTest do
     end
 
     @impl true
-    def handle_call_tool(request_id, params) do
-      {:ok, %{request_id: request_id, type: "call_tool", tool: params.tool_id}}
+    def handle_call_tool(request_id, _params) do
+      {:ok, %{request_id: request_id, type: "call_tool", content: []}}
     end
   end
 
@@ -73,12 +73,12 @@ defmodule MCPServerTest do
 
     test "optional callback handle_complete" do
       request_id = "789"
-      params = %{prompt: "test prompt"}
+      params = %{ref: %{type: "ref/prompt", name: "test_prompt"}}
 
       assert {:ok, response} = MockServer.handle_complete(request_id, params)
       assert response.type == "completion"
       assert response.request_id == request_id
-      assert response.result == params.prompt
+      assert Map.has_key?(response, :completion)
     end
 
     test "behaviour module defines expected callbacks" do
