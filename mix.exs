@@ -58,7 +58,6 @@ defmodule MCPSse.MixProject do
   defp deps do
     [
       {:bandit, "~> 1.5"},
-      {:jason, "~> 1.4"},
       {:plug, "~> 1.14"},
       {:plug_cowboy, "~> 2.6", only: :test},
 

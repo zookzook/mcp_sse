@@ -1,7 +1,6 @@
 # Simple MCP client script to demonstrate protocol flow
 Mix.install([
   {:httpoison, "~> 1.8"},  # Using 1.x version to be compatible with eventsource_ex
-  {:jason, "~> 1.4"},
   {:eventsource_ex, "~> 1.1.0"}
 ])
 
@@ -47,7 +46,7 @@ defmodule MCPClient do
     # Wait for initialize response
     receive do
       %EventsourceEx.Message{event: "message", data: data} ->
-        response = Jason.decode!(data)
+        response = JSON.decode!(data)
         IO.puts("✓ Server initialized with capabilities:")
         IO.puts("  - Protocol version: #{response["result"]["protocolVersion"]}")
         IO.puts("  - Server name: #{response["result"]["serverInfo"]["name"]}\n")
@@ -79,7 +78,7 @@ defmodule MCPClient do
     # Wait for tools list
     receive do
       %EventsourceEx.Message{event: "message", data: data} ->
-        response = Jason.decode!(data)
+        response = JSON.decode!(data)
         tools = response["result"]["tools"]
         IO.puts("✓ Available tools:")
         Enum.each(tools, fn tool ->
@@ -110,7 +109,7 @@ defmodule MCPClient do
     # Wait for tool response
     receive do
       %EventsourceEx.Message{event: "message", data: data} ->
-        response = Jason.decode!(data)
+        response = JSON.decode!(data)
         [content_item | _] = response["result"]["content"]
         IO.puts("✓ Tool response:")
         IO.puts("  Input: hello world")
@@ -133,7 +132,7 @@ defmodule MCPClient do
     # Wait for error response
     receive do
       %EventsourceEx.Message{event: "message", data: data} ->
-        response = Jason.decode!(data)
+        response = JSON.decode!(data)
         IO.puts("✓ Server responded with expected error:")
         IO.puts("  Code: #{response["error"]["code"]}")
         IO.puts("  Message: #{response["error"]["message"]}")
@@ -150,13 +149,13 @@ defmodule MCPClient do
   defp post_message(session_id, payload) do
     url = "http://localhost:4000/message?sessionId=#{session_id}"
     headers = [{"Content-Type", "application/json"}]
-    body = Jason.encode!(payload)
+    body = JSON.encode!(payload)
 
     case HTTPoison.post(url, body, headers) do
       {:ok, %{status_code: 202}} -> :ok
       {:ok, %{status_code: 400, body: body}} ->
         # Parse and display error response for 400 status
-        error = Jason.decode!(body)
+        error = JSON.decode!(body)
         IO.puts("✗ Server returned error: #{inspect(error)}")
         :ok
       error ->

@@ -87,7 +87,7 @@ defmodule YourApp.Router do
   plug Plug.Parsers,
     parsers: [:urlencoded, :json],
     pass: ["text/*"],
-    json_decoder: Jason
+    json_decoder: JSON
 
   plug :match
   plug :ensure_session_id
@@ -331,7 +331,7 @@ def handle_call_tool(request_id, %{"name" => "list_companies"} = _params) do
        content: [
          %{
            type: "text",
-           text: Jason.encode!(companies, pretty: true)
+           text: JSON.encode!(companies, pretty: true)
          }
        ]
      }

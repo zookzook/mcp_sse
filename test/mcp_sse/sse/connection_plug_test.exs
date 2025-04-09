@@ -57,7 +57,7 @@ defmodule SSE.ConnectionPlugTest do
       response = ConnectionPlug.call(conn, @opts)
 
       assert response.status == 202
-      assert Jason.decode!(response.resp_body) == %{"status" => "ok"}
+      assert JSON.decode!(response.resp_body) == %{"status" => "ok"}
     end
 
     test "handles initialized notification", %{conn: conn, state_pid: state_pid} do
@@ -73,7 +73,7 @@ defmodule SSE.ConnectionPlugTest do
       response = ConnectionPlug.call(conn, @opts)
 
       assert response.status == 202
-      assert Jason.decode!(response.resp_body) == %{"status" => "ok"}
+      assert JSON.decode!(response.resp_body) == %{"status" => "ok"}
     end
 
     test "handles cancelled notification", %{conn: conn} do
@@ -87,7 +87,7 @@ defmodule SSE.ConnectionPlugTest do
       response = ConnectionPlug.call(conn, @opts)
 
       assert response.status == 202
-      assert Jason.decode!(response.resp_body) == %{"status" => "ok"}
+      assert JSON.decode!(response.resp_body) == %{"status" => "ok"}
     end
 
     test "returns error for missing session", %{conn: conn} do
@@ -98,7 +98,7 @@ defmodule SSE.ConnectionPlugTest do
           response = ConnectionPlug.call(conn, @opts)
 
           assert response.status == 400
-          assert Jason.decode!(response.resp_body) == %{"error" => "session_id is required"}
+          assert JSON.decode!(response.resp_body) == %{"error" => "session_id is required"}
         end)
 
       assert log =~ "Missing session ID in request"
@@ -112,7 +112,7 @@ defmodule SSE.ConnectionPlugTest do
           response = ConnectionPlug.call(conn, @opts)
 
           assert response.status == 400
-          assert Jason.decode!(response.resp_body) == %{"error" => "Invalid session ID"}
+          assert JSON.decode!(response.resp_body) == %{"error" => "Invalid session ID"}
         end)
 
       assert log =~ "Invalid session ID provided"
@@ -126,7 +126,7 @@ defmodule SSE.ConnectionPlugTest do
           response = ConnectionPlug.call(conn, @opts)
 
           assert response.status == 404
-          assert Jason.decode!(response.resp_body) == %{"error" => "Could not find session"}
+          assert JSON.decode!(response.resp_body) == %{"error" => "Could not find session"}
         end)
 
       assert log =~ "Session not found: nonexistent"
@@ -141,7 +141,7 @@ defmodule SSE.ConnectionPlugTest do
           response = ConnectionPlug.call(conn, @opts)
 
           assert response.status == 200
-          response_body = Jason.decode!(response.resp_body)
+          response_body = JSON.decode!(response.resp_body)
           assert response_body["error"]["code"] == -32600
           assert response_body["error"]["message"] == "Could not parse message"
         end)

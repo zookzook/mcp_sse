@@ -9,7 +9,7 @@ defmodule MCPSse.Example.Server do
   plug(Plug.Parsers,
     parsers: [:json],
     pass: ["text/*"],
-    json_decoder: Jason
+    json_decoder: JSON
   )
 
   plug(:match)

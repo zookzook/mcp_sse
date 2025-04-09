@@ -59,13 +59,13 @@ defmodule SSE.ConnectionPlug do
   defp send_json(conn, data) do
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(conn.status || 200, Jason.encode!(data))
+    |> send_resp(conn.status || 200, JSON.encode!(data))
   end
 
   defp send_error(conn, status, message) do
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(status, Jason.encode!(%{error: message}))
+    |> send_resp(status, JSON.encode!(%{error: message}))
   end
 
   defp send_jsonrpc_error(conn, id, code, message, data \\ nil) do
@@ -84,7 +84,7 @@ defmodule SSE.ConnectionPlug do
 
     conn
     |> put_resp_content_type("application/json")
-    |> send_resp(200, Jason.encode!(response))
+    |> send_resp(200, JSON.encode!(response))
   end
 
   defp handle_sse(conn) do
@@ -254,7 +254,7 @@ defmodule SSE.ConnectionPlug do
   end
 
   defp handle_sse_message(conn, _session_id, _state_pid, msg) do
-    sse_message = "event: message\ndata: #{Jason.encode!(msg)}\n\n"
+    sse_message = "event: message\ndata: #{JSON.encode!(msg)}\n\n"
     Logger.debug("Sending SSE message:\n#{sse_message}")
 
     case chunk(conn, sse_message) do
@@ -270,7 +270,7 @@ defmodule SSE.ConnectionPlug do
       params: %{}
     }
 
-    case chunk(conn, "event: message\ndata: #{Jason.encode!(ping_notification)}\n\n") do
+    case chunk(conn, "event: message\ndata: #{JSON.encode!(ping_notification)}\n\n") do
       {:ok, conn} -> {:ok, conn}
       {:error, :closed} -> {:error, :closed}
     end
