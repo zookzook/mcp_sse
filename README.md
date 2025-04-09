@@ -196,7 +196,11 @@ For detailed information about the Model Context Protocol, visit:
 
 ## Contributing
 
-...
+- Fork the repository and clone it
+- Create a new branch in your fork
+- Make your changes and commit them
+- Push the changes to your fork
+- Open a pull request in upstream
 
 ## Quick Demo
 
