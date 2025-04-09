@@ -4,7 +4,7 @@ Mix.install([
   {:eventsource_ex, "~> 1.1.0"}
 ])
 
-defmodule MCPClient do
+defmodule MCPSse.Example.Client do
   require Logger
 
   def run do
@@ -170,4 +170,4 @@ defmodule MCPClient do
 end
 
 # Run the demo
-MCPClient.run()
+MCPSse.Example.Client.run()

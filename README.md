@@ -27,7 +27,7 @@ config :mcp_sse, :mcp_server, MCP.DefaultServer
 ```elixir
 def deps do
   [
-    {:mcp_sse, "~> 0.1.0"}
+    {:mcp_sse, "~> 0.1.4"}
   ]
 end
 ```
@@ -51,11 +51,13 @@ end
 ### For Plug Applications with Bandit:
 
 1. Create a new Plug application with supervision:
+
 ```bash
 mix new your_app --sup
 ```
 
 2. Add the required configuration to `config/config.exs`:
+
 ```elixir
 import Config
 
@@ -69,10 +71,11 @@ config :mcp_sse, :mcp_server, YourApp.MCPServer
 ```
 
 3. Add dependencies to `mix.exs`:
+
 ```elixir
 def deps do
   [
-    {:mcp_sse, "~> 0.1.0"},
+    {:mcp_sse, "~> 0.1.4"},
     {:plug, "~> 1.14"},
     {:bandit, "~> 1.2"}
   ]
@@ -80,6 +83,7 @@ end
 ```
 
 4. Configure your router (`lib/your_app/router.ex`):
+
 ```elixir
 defmodule YourApp.Router do
   use Plug.Router
@@ -125,6 +129,7 @@ end
 ```
 
 5. Set up your application supervision (`lib/your_app/application.ex`):
+
 ```elixir
 defmodule YourApp.Application do
   use Application
@@ -174,12 +179,12 @@ The `use MCPServer` macro provides:
 
 You only need to implement the required callbacks (`handle_ping/1` and `handle_initialize/2`) and any optional callbacks for features you want to support.
 
-### Protocol Documentation
+## Protocol Specification
 
 For detailed information about the Model Context Protocol, visit:
-[Model Context Protocol Documentation](https://github.com/cursor-ai/model-context-protocol)
+[Model Context Protocol Specification](https://modelcontextprotocol.io/specification/2024-11-05/index)
 
-### Features
+## Features
 
 - Full MCP server implementation
 - SSE connection management
@@ -193,18 +198,18 @@ For detailed information about the Model Context Protocol, visit:
 
 ...
 
-### Quick Demo
+## Quick Demo
 
 To see the MCP server in action:
 
-1. Start the Phoenix server:
+1. Start the example server in one terminal:
 ```bash
-mix phx.server
+elixir dev/example_server.exs
 ```
 
 2. In another terminal, run the demo client script:
 ```bash
-elixir examples/mcp_client.exs
+elixir dev/example_client.exs
 ```
 
 The client script will:
