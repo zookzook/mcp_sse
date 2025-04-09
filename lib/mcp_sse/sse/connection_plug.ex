@@ -137,9 +137,7 @@ defmodule SSE.ConnectionPlug do
           conn |> put_status(202) |> send_json(%{status: "ok"})
 
         _ ->
-          if not Map.has_key?(message, "id") do
-            conn |> put_status(202) |> send_json(%{status: "ok"})
-          else
+          if Map.has_key?(message, "id") do
             # Handle requests that expect responses
             case MessageRouter.handle_message(message) do
               {:ok, nil} ->
@@ -156,6 +154,8 @@ defmodule SSE.ConnectionPlug do
                 send(sse_pid, {:send_sse_message, error_response})
                 conn |> put_status(400) |> send_json(error_response)
             end
+          else
+            conn |> put_status(202) |> send_json(%{status: "ok"})
           end
       end
     else

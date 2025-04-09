@@ -62,7 +62,11 @@ defmodule MCPSse.MixProject do
       {:plug_cowboy, "~> 2.6", only: :test},
 
       # Documentation
-      {:ex_doc, "~> 0.31", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.31", only: :dev, runtime: false},
+
+      # pre-commit
+      {:git_hooks, "~> 0.8.0", only: [:dev], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
     ]
   end
 

@@ -5,8 +5,8 @@ defmodule SSE.ConnectionPlugTest do
   import ExUnit.CaptureLog
 
   alias SSE.ConnectionPlug
-  alias SSE.ConnectionState
   alias SSE.ConnectionRegistry
+  alias SSE.ConnectionState
 
   @opts ConnectionPlug.init([])
 
