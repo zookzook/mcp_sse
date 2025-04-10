@@ -1,5 +1,11 @@
 # MCP over SSE
 
+[![Module Version](https://img.shields.io/hexpm/v/mcp_sse.svg)](https://github.com/kEND/mcp_sse/tags)
+[![Hex Docs](https://img.shields.io/badge/hex-docs-purple.svg)](https://hexdocs.pm/mcp_sse/)
+[![Total Download](https://img.shields.io/hexpm/dt/mcp_sse.svg)](https://hex.pm/packages/mcp_sse)
+[![License](https://img.shields.io/hexpm/l/mcp_sse.svg)](https://github.com/kEND/mcp_sse/blob/main/LICENSE)
+[![Last Updated](https://img.shields.io/github/last-commit/kEND/mcp_sse.svg)](https://github.com/kEND/mcp_sse/commits/main)
+
 This library provides a simple implementation of the Model Context Protocol (MCP) over Server-Sent Events (SSE).
 
 For more information about the Model Context Protocol, visit:
