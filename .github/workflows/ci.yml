@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  - push
+  - pull_request
+  - workflow_dispatch
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Elixir ${{ matrix.elixir }} / OTP ${{ matrix.otp }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        elixir: [1.18.2]
+        otp: [27.2]
+
+    env:
+      MIX_ENV: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Beam
+        uses: erlef/setup-beam@v1
+        with:
+          elixir-version: ${{ matrix.elixir }}
+          otp-version: ${{ matrix.otp }}
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        id: cache-deps
+        with:
+          path: deps
+          key: deps-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: deps-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}
+
+      - name: Cache build
+        uses: actions/cache@v4
+        id: cache-build
+        with:
+          path: _build
+          key: build-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}-${{ hashFiles('**/mix.lock') }}
+          restore-keys: build-${{ runner.os }}-${{ matrix.elixir }}-${{ matrix.otp }}
+
+      - name: Get dependencies
+        run: mix deps.get --only ${{ env.MIX_ENV }}
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+
+      - name: Compile dependencies
+        run: mix deps.compile --warnings-as-errors
+        if: steps.cache-build.outputs.cache-hit != 'true'
+
+      - name: Compile
+        run: mix compile --warnings-as-errors
+
+      - name: Format
+        run: mix format --check-formatted
+
+      - name: Credo
+        run: mix credo
+
+      - name: Test
+        run: mix test
