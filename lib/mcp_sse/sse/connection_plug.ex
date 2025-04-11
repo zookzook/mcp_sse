@@ -18,8 +18,6 @@ defmodule SSE.ConnectionPlug do
       scope "/" do
         pipe_through :sse
         get "/sse", SSE.ConnectionPlug, :call
-
-        pipe_through :api
         post "/message", SSE.ConnectionPlug, :call
       end
 
