@@ -4,13 +4,17 @@ defmodule MCP.DefaultServerTest do
   import ExUnit.CaptureLog
 
   alias MCP.DefaultServer
+  alias MCP.Test.JsonRpcSchema
 
   @protocol_version "2024-11-05"
 
   describe "handle_ping/1" do
     test "returns pong response" do
       request_id = "ping-1"
+
       assert {:ok, response} = DefaultServer.handle_ping(request_id)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.jsonrpc == "2.0"
       assert response.id == request_id
       assert response.result == %{}
@@ -29,6 +33,8 @@ defmodule MCP.DefaultServerTest do
       }
 
       assert {:ok, response} = DefaultServer.handle_initialize(request_id, params)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.jsonrpc == "2.0"
       assert response.id == request_id
       assert response.result.protocolVersion == @protocol_version
@@ -71,9 +77,13 @@ defmodule MCP.DefaultServerTest do
       params = %{}
 
       assert {:ok, response} = DefaultServer.handle_list_tools(request_id, params)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.jsonrpc == "2.0"
       assert response.id == request_id
+
       [tool] = response.result.tools
+
       assert tool.name == "upcase"
       assert tool.description == "Converts text to uppercase"
       assert tool.inputSchema.required == ["text"]
@@ -93,9 +103,13 @@ defmodule MCP.DefaultServerTest do
       }
 
       assert {:ok, response} = DefaultServer.handle_call_tool(request_id, params)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.jsonrpc == "2.0"
       assert response.id == request_id
+
       [content] = response.result.content
+
       assert content.type == "text"
       assert content.text == "HELLO WORLD"
     end
@@ -111,6 +125,8 @@ defmodule MCP.DefaultServerTest do
       log =
         capture_log(fn ->
           assert {:error, response} = DefaultServer.handle_call_tool(request_id, params)
+          assert JsonRpcSchema.valid?(JsonRpcSchema.error_schema(), response)
+
           assert response.jsonrpc == "2.0"
           assert response.id == request_id
           assert response.error.code == -32601

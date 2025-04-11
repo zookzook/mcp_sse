@@ -59,18 +59,22 @@ defmodule MCPSse.MixProject do
     [
       {:bandit, "~> 1.5"},
       {:plug, "~> 1.14"},
-      {:plug_cowboy, "~> 2.6", only: :test},
 
       # Documentation
       {:ex_doc, "~> 0.31", only: :dev, runtime: false},
 
       # pre-commit
       {:git_hooks, "~> 0.8.0", only: [:dev], runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false}
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+
+      # Testing
+      {:plug_cowboy, "~> 2.6", only: :test},
+      {:ex_json_schema, "~> 0.10.2", only: :test}
     ]
   end
 
   # Specify which paths to compile per environment
   defp elixirc_paths(:dev), do: ["lib", "dev"]
+  defp elixirc_paths(:test), do: ["lib", "test"]
   defp elixirc_paths(_), do: ["lib"]
 end

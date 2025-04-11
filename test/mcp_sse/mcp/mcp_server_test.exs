@@ -55,6 +55,7 @@ defmodule MCPServerTest do
   describe "MCPServer behaviour" do
     test "handle_ping implementation" do
       request_id = "123"
+
       assert {:ok, response} = MockServer.handle_ping(request_id)
       assert response.type == "pong"
       assert response.request_id == request_id
@@ -62,6 +63,7 @@ defmodule MCPServerTest do
 
     test "handle_initialize implementation" do
       request_id = "456"
+
       capabilities = %{version: "1.0"}
       params = %{capabilities: capabilities}
 
@@ -73,6 +75,7 @@ defmodule MCPServerTest do
 
     test "optional callback handle_complete" do
       request_id = "789"
+
       params = %{ref: %{type: "ref/prompt", name: "test_prompt"}}
 
       assert {:ok, response} = MockServer.handle_complete(request_id, params)
