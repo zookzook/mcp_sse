@@ -1,7 +1,8 @@
 defmodule SSE.ConnectionPlugTest do
   use ExUnit.Case, async: false
   # Add this to get conn test helpers for plugs
-  use Plug.Test
+  import Plug.Conn
+  import Plug.Test
   import ExUnit.CaptureLog
 
   alias MCP.Test.JsonRpcSchema
