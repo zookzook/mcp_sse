@@ -207,7 +207,20 @@ mix run --no-halt
 
 ## Usage
 
-### For Cursor
+### With MCP Inspector
+
+- Start the inspector: 
+
+```bash
+MCP_SERVER_URL=localhost:4000 npx @modelcontextprotocol/inspector@latest
+```
+
+- Navigate to http://localhost:6274/
+- Make sure your server is running
+- Click `Connect`
+- You can now list tools and call them
+
+### With Cursor
 
 - Open Cursor Settings
 - Navigate to the MCP tab
