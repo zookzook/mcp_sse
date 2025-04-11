@@ -1,8 +1,11 @@
 defmodule SSE.ConnectionPlugTest do
   use ExUnit.Case, async: false
   # Add this to get conn test helpers for plugs
-  use Plug.Test
+  import Plug.Conn
+  import Plug.Test
   import ExUnit.CaptureLog
+
+  alias MCP.Test.JsonRpcSchema
 
   alias SSE.ConnectionPlug
   alias SSE.ConnectionRegistry
@@ -141,7 +144,10 @@ defmodule SSE.ConnectionPlugTest do
           response = ConnectionPlug.call(conn, @opts)
 
           assert response.status == 200
+
           response_body = JSON.decode!(response.resp_body)
+          assert JsonRpcSchema.valid?(JsonRpcSchema.error_schema(), response_body)
+
           assert response_body["error"]["code"] == -32600
           assert response_body["error"]["message"] == "Could not parse message"
         end)

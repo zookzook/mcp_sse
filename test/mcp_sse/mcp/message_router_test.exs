@@ -3,6 +3,8 @@ defmodule MCP.MessageRouterTest do
   require Logger
   import ExUnit.CaptureLog
 
+  alias MCP.Test.JsonRpcSchema
+
   # Mock MCP Server for testing
   defmodule MockMCPServer do
     @behaviour MCPServer
@@ -83,6 +85,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "123"
       assert response.result == %{}
     end
@@ -98,6 +102,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "456"
       assert response.result["capabilities"]["version"] == "1.0"
     end
@@ -111,6 +117,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "789"
       assert Map.has_key?(response.result, :completion)
     end
@@ -124,6 +132,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "789"
       assert Map.has_key?(response.result, :prompts)
     end
@@ -139,6 +149,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "789"
       assert response.result["description"] == "test_prompt"
     end
@@ -152,6 +164,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "789"
       assert Map.has_key?(response.result, :resources)
     end
@@ -167,6 +181,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "789"
       assert Map.has_key?(response.result, :contents)
     end
@@ -180,6 +196,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "789"
       assert Map.has_key?(response.result, :tools)
     end
@@ -195,6 +213,8 @@ defmodule MCP.MessageRouterTest do
       }
 
       assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
+
       assert response.id == "101"
       assert Map.has_key?(response.result, :content)
     end
@@ -209,6 +229,8 @@ defmodule MCP.MessageRouterTest do
       log =
         capture_log(fn ->
           assert {:error, response} = MCP.MessageRouter.handle_message(message)
+          assert JsonRpcSchema.valid?(JsonRpcSchema.error_schema(), response)
+
           assert response.id == "999"
           assert response.error.code == -32601
           assert response.error.message == "Method not found"
@@ -226,6 +248,8 @@ defmodule MCP.MessageRouterTest do
       log =
         capture_log(fn ->
           assert {:error, response} = MCP.MessageRouter.handle_message(message)
+          assert JsonRpcSchema.valid?(JsonRpcSchema.error_schema(), response)
+
           assert response.id == nil
           assert response.error.code == -32600
           assert response.error.message == "Invalid Request"
