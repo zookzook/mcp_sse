@@ -1,6 +1,6 @@
 # MCP over SSE
 
-[![Module Version](https://img.shields.io/hexpm/v/mcp_sse.svg)](https://github.com/kEND/mcp_sse/tags)
+[![Module Version](https://img.shields.io/hexpm/v/mcp_sse.svg)](https://github.com/kEND/mcp_sse/releases)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-purple.svg)](https://hexdocs.pm/mcp_sse/)
 [![Total Download](https://img.shields.io/hexpm/dt/mcp_sse.svg)](https://hex.pm/packages/mcp_sse)
 [![License](https://img.shields.io/hexpm/l/mcp_sse.svg)](https://github.com/kEND/mcp_sse/blob/main/LICENSE)
