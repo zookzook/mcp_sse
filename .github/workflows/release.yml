@@ -31,11 +31,9 @@ jobs:
           elixir-version: '1.18.2'
           otp-version: '27.2'
 
-      - name: Get dependencies
-        run: mix deps.get
-
-      - name: Mix release
-        run: mix release
+      - name: Publish to Hex
+        run: mix hex.publish
+        env: HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
 
       - name: Tag to version
         id: tag
@@ -56,8 +54,3 @@ jobs:
           tag_name: ${{ inputs.tag || github.ref_name }}
           make_latest: ${{ inputs.tag == '' || inputs.tag == github.ref_name }}
           body: ${{ steps.changelog.outputs.changes }}
-
-      - name: Hex release
-        uses: erlangpack/github-action@v3
-        env:
-          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
