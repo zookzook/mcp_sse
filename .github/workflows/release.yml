@@ -1,57 +1,16 @@
-name: Release
-
 on:
   push:
     tags:
-      - 'v*'
-  workflow_dispatch:
-    inputs:
-      tag:
-        type: string
-        required: true
-        description: 'tag (vX.Y.Z)'
-
-permissions:
-  contents: write
+      - '*'
 
 jobs:
-  release:
-    name: ${{ inputs.tag || github.ref_name }}
+  publish:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ inputs.tag || github.ref_name }}
+      - name: Check out
+        uses: actions/checkout@v2
 
-      - name: Setup Beam
-        uses: erlef/setup-beam@v1
-        with:
-          elixir-version: '1.18.2'
-          otp-version: '27.2'
-
-      - name: Publish to Hex
-        run: mix hex.publish
-        env: 
+      - name: Publish package to hex.pm
+        uses: wesleimp/action-publish-hex@v1
+        env:
           HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
-
-      - name: Tag to version
-        id: tag
-        run: |
-          echo TAG=${{ inputs.tag || github.ref_name }}
-          echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
-
-      - name: Changelog
-        uses: mindsers/changelog-reader-action@v2
-        id: changelog
-        with:
-          validation_level: warn
-          version: ${{ steps.tag.outputs.version }}
-
-      - name: GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ inputs.tag || github.ref_name }}
-          make_latest: ${{ inputs.tag == '' || inputs.tag == github.ref_name }}
-          body: ${{ steps.changelog.outputs.changes }}
