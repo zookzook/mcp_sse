@@ -5,6 +5,7 @@
 [![MCP Specification Version](https://img.shields.io/badge/spec-2024--11--05-blue)](https://modelcontextprotocol.io/specification/2024-11-05/index)
 [![Downloads](https://img.shields.io/hexpm/dt/mcp_sse.svg)](https://hex.pm/packages/mcp_sse)
 [![License](https://img.shields.io/badge/licence-MIT-blue.svg)](https://github.com/kEND/mcp_sse/blob/main/LICENSE)
+[![CI](https://github.com/kEND/mcp_sse/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/kEND/mcp_sse/actions/workflows/ci.yml?query=branch%3Amain)
 [![Last Commit](https://img.shields.io/github/last-commit/kEND/mcp_sse.svg)](https://github.com/kEND/mcp_sse/commits/main)
 
 This library provides a simple implementation of the Model Context Protocol (MCP) over Server-Sent Events (SSE).
