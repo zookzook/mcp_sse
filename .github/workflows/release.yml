@@ -33,7 +33,8 @@ jobs:
 
       - name: Publish to Hex
         run: mix hex.publish
-        env: HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
+        env: 
+          HEX_API_KEY: ${{ secrets.HEX_API_KEY }}
 
       - name: Tag to version
         id: tag
