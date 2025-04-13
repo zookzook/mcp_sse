@@ -1,7 +1,7 @@
 defmodule MCPServer do
   @moduledoc """
   Behaviour definition for implementing MCP (Model Context Protocol) servers.
-  Provides a standardized interface for handling MCP protocol messages and tools.
+  Provides a standardized interface for handling MCP messages and tools.
 
   ## Example
 

@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Built-in connection management
 - Default MCP server implementation
 - Example server for development
-- Full MCP protocol support including:
+- Full MCP support including:
   - Connection initialization
   - Tool registration and execution
   - Automatic ping/keepalive

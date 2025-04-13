@@ -1,13 +1,13 @@
 defmodule SSE.ConnectionPlug do
   @moduledoc """
-  A Plug for handling Server-Sent Events (SSE) connections with MCP protocol support.
+  A Plug for handling Server-Sent Events (SSE) connections with Model Context Protocol (MCP) support.
 
   Query params:
     * `sessionId` - The session ID for the connection
 
   This plug provides two endpoints:
     * `/sse` - Establishes the SSE connection
-    * `/message` - Handles JSON-RPC messages for the MCP protocol
+    * `/message` - Handles JSON-RPC messages for the Model Context Protocol
 
   ## Usage in Phoenix Router
 
