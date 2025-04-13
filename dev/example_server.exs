@@ -49,7 +49,7 @@ defmodule MCPSse.Example.Server do
 end
 
 # Start the MCPSse application
-Application.ensure_all_started(:mcp_sse)
+{:ok, _} = MCP.SSE.start()
 
 # Create a supervision tree for our example server
 children = [

@@ -11,7 +11,7 @@
 This library provides a simple implementation of the Model Context Protocol (MCP) over Server-Sent Events (SSE).
 
 For more information about the Model Context Protocol, visit:
-[Model Context Protocol Documentation](https://modelcontextprotocol.io/introduction)
+[Model Context Protocol Documentation](https://modelcontextprotocol.io/introduction).
 
 ## Table of Contents
 
