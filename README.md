@@ -21,13 +21,16 @@ For more information about the Model Context Protocol, visit:
   - [For Phoenix Applications](#for-phoenix-applications)
   - [For Plug Applications with Bandit](#for-plug-applications-with-bandit)
 - [Usage](#usage)
-  - [For Cursor](#for-cursor)
-- [Configuration Options](#configuration-options)
+  - [With MCP Inspector](#with-mcp-inspector)
+  - [With Cursor](#with-cursor)
+- [Configuration](#configuration)
+  - [Port and HTTPS](#port-and-https)
+  - [Paths](#paths)
+  - [Keepalive](#keepalive)
 - [Quick Demo](#quick-demo)
 - [Other Notes](#other-notes)
   - [Example Client Usage](#example-client-usage)
   - [Session Management](#session-management)
-  - [SSE Keepalive](#sse-keepalive)
   - [MCP Response Formatting](#mcp-response-formatting)
 - [Contributing](#contributing)
 
@@ -241,7 +244,9 @@ MCP_SERVER_URL=localhost:4000 npx @modelcontextprotocol/inspector@latest
 - Make sure your server is running
 - Ask Cursor to run one of your tools
 
-## Configuration Options
+## Configuration
+
+### Port and HTTPS
 
 The Bandit server can be configured with additional options in your application module:
 
@@ -256,6 +261,44 @@ children = [
     keyfile: "priv/cert/selfsigned_key.pem"
   }
 ]
+```
+
+### Paths
+
+You can customize the paths used for the SSE and message endpoints:
+
+```elixir
+config :mcp_sse,
+  sse_path: "/mcp/sse",    # Default: "/sse"
+  message_path: "/mcp/msg" # Default: "/message"
+```
+
+This allows you to use custom paths in your routers:
+
+```elixir
+# Phoenix
+scope "/mcp" do
+  pipe_through :sse
+  get "/sse", SSE.ConnectionPlug, :call
+  post "/msg", SSE.ConnectionPlug, :call
+end
+
+# Plug
+forward "/mcp/sse", to: SSE.ConnectionPlug
+forward "/mcp/msg", to: SSE.ConnectionPlug
+```
+
+### Keepalive
+
+The SSE connection sends periodic keepalive pings to prevent connection timeouts.
+You can configure the ping interval or disable it entirely in `config/config.exs`:
+
+```elixir
+# Set custom ping interval (in milliseconds)
+config :mcp_sse, :sse_keepalive_timeout, 30_000  # 30 seconds
+
+# Or disable pings entirely
+config :mcp_sse, :sse_keepalive_timeout, :infinity
 ```
 
 ## Quick Demo
@@ -324,19 +367,6 @@ The MCP SSE server requires a session ID for each connection. The router automat
 - Uses an existing session ID from query parameters if provided
 - Generates a new session ID if none exists
 - Ensures all requests to `/sse` and `/message` endpoints have a valid session ID
-
-### SSE Keepalive
-
-The SSE connection sends periodic keepalive pings to prevent connection timeouts.
-You can configure the ping interval or disable it entirely in `config/config.exs`:
-
-```elixir
-# Set custom ping interval (in milliseconds)
-config :mcp_sse, :sse_keepalive_timeout, 30_000  # 30 seconds
-
-# Or disable pings entirely
-config :mcp_sse, :sse_keepalive_timeout, :infinity
-```
 
 ### MCP Response Formatting
 

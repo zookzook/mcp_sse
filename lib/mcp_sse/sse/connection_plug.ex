@@ -25,6 +25,12 @@ defmodule SSE.ConnectionPlug do
 
       forward "/sse", to: SSE.ConnectionPlug
       forward "/message", to: SSE.ConnectionPlug
+
+  The paths can be configured in your application config:
+
+      config :mcp_sse,
+        sse_path: "/mcp/sse",
+        message_path: "/mcp/msg"
   """
 
   import Plug.Conn
