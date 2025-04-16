@@ -1,13 +1,13 @@
 defmodule SSE.ConnectionPlug do
   @moduledoc """
-  A Plug for handling Server-Sent Events (SSE) connections with MCP protocol support.
+  A Plug for handling Server-Sent Events (SSE) connections with Model Context Protocol (MCP) support.
 
   Query params:
     * `sessionId` - The session ID for the connection
 
   This plug provides two endpoints:
     * `/sse` - Establishes the SSE connection
-    * `/message` - Handles JSON-RPC messages for the MCP protocol
+    * `/message` - Handles JSON-RPC messages for the Model Context Protocol
 
   ## Usage in Phoenix Router
 
@@ -25,6 +25,12 @@ defmodule SSE.ConnectionPlug do
 
       forward "/sse", to: SSE.ConnectionPlug
       forward "/message", to: SSE.ConnectionPlug
+
+  The paths can be configured in your application config:
+
+      config :mcp_sse,
+        sse_path: "/mcp/sse",
+        message_path: "/mcp/msg"
   """
 
   import Plug.Conn
@@ -34,6 +40,8 @@ defmodule SSE.ConnectionPlug do
   alias SSE.ConnectionRegistry
   alias SSE.ConnectionState
 
+  @sse_path Application.compile_env(:mcp_sse, :sse_path, "/sse")
+  @message_path Application.compile_env(:mcp_sse, :message_path, "/message")
   @sse_keepalive_timeout Application.compile_env(:mcp_sse, :sse_keepalive_timeout, 15_000)
 
   # Standard Plug callback
@@ -42,13 +50,13 @@ defmodule SSE.ConnectionPlug do
 
   # Standard Plug callback
   @doc false
-  def call(%Plug.Conn{request_path: "/sse"} = conn, _opts) do
+  def call(%Plug.Conn{request_path: @sse_path} = conn, _opts) do
     handle_sse(conn)
   end
 
   # Standard Plug callback
   @doc false
-  def call(%Plug.Conn{request_path: "/message"} = conn, _opts) do
+  def call(%Plug.Conn{request_path: @message_path} = conn, _opts) do
     handle_message(conn)
   end
 
@@ -194,7 +202,8 @@ defmodule SSE.ConnectionPlug do
   end
 
   defp send_initial_message(conn, session_id) do
-    endpoint = "#{conn.scheme}://#{conn.host}:#{conn.port}/message?sessionId=#{session_id}"
+    endpoint =
+      "#{conn.scheme}://#{conn.host}:#{conn.port}#{@message_path}?sessionId=#{session_id}"
 
     case chunk(conn, "event: endpoint\ndata: #{endpoint}\n\n") do
       {:ok, conn} -> conn

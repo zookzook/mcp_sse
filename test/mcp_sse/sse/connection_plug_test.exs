@@ -1,5 +1,6 @@
 defmodule SSE.ConnectionPlugTest do
   use ExUnit.Case, async: false
+
   # Add this to get conn test helpers for plugs
   import Plug.Conn
   import Plug.Test
@@ -10,6 +11,9 @@ defmodule SSE.ConnectionPlugTest do
   alias SSE.ConnectionPlug
   alias SSE.ConnectionRegistry
   alias SSE.ConnectionState
+
+  @sse_path Application.compile_env(:mcp_sse, :sse_path)
+  @message_path Application.compile_env(:mcp_sse, :message_path)
 
   @opts ConnectionPlug.init([])
 
@@ -31,9 +35,9 @@ defmodule SSE.ConnectionPlugTest do
       {:ok, state_pid} = ConnectionState.start_link(session_id)
       :ets.insert(ConnectionRegistry.table_name(), {session_id, self(), state_pid})
 
-      # Build a test connection for a POST to /message
+      # Build a test connection for a POST to the message path
       conn =
-        conn(:post, "/message", %{})
+        conn(:post, @message_path, %{})
         |> Map.put(:query_params, %{"sessionId" => session_id})
         |> put_req_header("content-type", "application/json")
 
@@ -159,7 +163,7 @@ defmodule SSE.ConnectionPlugTest do
   describe "SSE connection" do
     test "establishes SSE connection with correct headers" do
       conn =
-        conn(:get, "/sse")
+        conn(:get, @sse_path)
         |> Map.put(:scheme, :http)
         |> Map.put(:host, "localhost")
         |> Map.put(:port, 4000)

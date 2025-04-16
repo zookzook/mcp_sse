@@ -30,7 +30,7 @@ defmodule MCPSse.MixProject do
       licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @source_url,
-        "MCP Protocol" => "https://modelcontextprotocol.io/introduction"
+        "Model Context Protocol" => "https://modelcontextprotocol.io/introduction"
       },
       files: ~w(lib .formatter.exs mix.exs README.md LICENSE)
     ]
