@@ -80,7 +80,7 @@ config :mcp_sse, :mcp_server, YourApp.YourMCPServer
 ```elixir
 def deps do
   [
-    {:mcp_sse, "~> 0.1.5"}
+    {:mcp_sse, "~> 0.1.6"}
   ]
 end
 ```
@@ -132,7 +132,7 @@ config :mcp_sse, :mcp_server, YourApp.YourMCPServer
 ```elixir
 def deps do
   [
-    {:mcp_sse, "~> 0.1.5"},
+    {:mcp_sse, "~> 0.1.6"},
     {:plug, "~> 1.14"},
     {:bandit, "~> 1.2"}
   ]
