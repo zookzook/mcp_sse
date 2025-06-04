@@ -124,7 +124,7 @@ defmodule SSE.ConnectionPlug do
           Logger.debug("Full message: #{inspect(msg, pretty: true)}")
           ConnectionState.handle_initialize(state_pid)
 
-          case MessageRouter.handle_message(msg) do
+          case MessageRouter.handle_message(conn, msg) do
             {:ok, response} ->
               Logger.debug("Sending SSE response: #{inspect(response, pretty: true)}")
               send(sse_pid, {:send_sse_message, response})
@@ -145,7 +145,7 @@ defmodule SSE.ConnectionPlug do
         _ ->
           if Map.has_key?(message, "id") do
             # Handle requests that expect responses
-            case MessageRouter.handle_message(message) do
+            case MessageRouter.handle_message(conn, message) do
               {:ok, nil} ->
                 conn |> put_status(202) |> send_json(%{status: "ok"})
 

@@ -12,7 +12,7 @@ defmodule MCP.DefaultServerTest do
     test "returns pong response" do
       request_id = "ping-1"
 
-      assert {:ok, response} = DefaultServer.handle_ping(request_id)
+      assert {:ok, response} = DefaultServer.handle_ping(%{}, request_id)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.jsonrpc == "2.0"
@@ -32,7 +32,7 @@ defmodule MCP.DefaultServerTest do
         }
       }
 
-      assert {:ok, response} = DefaultServer.handle_initialize(request_id, params)
+      assert {:ok, response} = DefaultServer.handle_initialize(%{}, request_id, params)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.jsonrpc == "2.0"
@@ -53,7 +53,7 @@ defmodule MCP.DefaultServerTest do
         }
       }
 
-      assert {:error, reason} = DefaultServer.handle_initialize(request_id, params)
+      assert {:error, reason} = DefaultServer.handle_initialize(%{}, request_id, params)
       assert reason =~ "Unsupported protocol version"
     end
 
@@ -66,7 +66,7 @@ defmodule MCP.DefaultServerTest do
         }
       }
 
-      assert {:error, reason} = DefaultServer.handle_initialize(request_id, params)
+      assert {:error, reason} = DefaultServer.handle_initialize(%{}, request_id, params)
       assert reason == "Protocol version is required"
     end
   end
@@ -76,7 +76,7 @@ defmodule MCP.DefaultServerTest do
       request_id = "tools-1"
       params = %{}
 
-      assert {:ok, response} = DefaultServer.handle_list_tools(request_id, params)
+      assert {:ok, response} = DefaultServer.handle_list_tools(%{}, request_id, params)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.jsonrpc == "2.0"
@@ -102,7 +102,7 @@ defmodule MCP.DefaultServerTest do
         }
       }
 
-      assert {:ok, response} = DefaultServer.handle_call_tool(request_id, params)
+      assert {:ok, response} = DefaultServer.handle_call_tool(%{}, request_id, params)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.jsonrpc == "2.0"
@@ -124,7 +124,7 @@ defmodule MCP.DefaultServerTest do
 
       log =
         capture_log(fn ->
-          assert {:error, response} = DefaultServer.handle_call_tool(request_id, params)
+          assert {:error, response} = DefaultServer.handle_call_tool(%{}, request_id, params)
           assert JsonRpcSchema.valid?(JsonRpcSchema.error_schema(), response)
 
           assert response.jsonrpc == "2.0"

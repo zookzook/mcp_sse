@@ -10,49 +10,49 @@ defmodule MCP.MessageRouterTest do
     @behaviour MCPServer
 
     @impl true
-    def handle_ping(request_id) do
+    def handle_ping(_conn, request_id) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{}}}
     end
 
     @impl true
-    def handle_initialize(request_id, params) do
+    def handle_initialize(_conn, request_id, params) do
       capabilities = params["capabilities"]
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{"capabilities" => capabilities}}}
     end
 
     @impl true
-    def handle_complete(request_id, _params) do
+    def handle_complete(_conn, request_id, _params) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{completion: %{}}}}
     end
 
     @impl true
-    def handle_list_prompts(request_id, _params) do
+    def handle_list_prompts(_conn, request_id, _params) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{prompts: []}}}
     end
 
     @impl true
-    def handle_get_prompt(request_id, params) do
+    def handle_get_prompt(_conn, request_id, params) do
       name = params["name"]
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{"description" => name}}}
     end
 
     @impl true
-    def handle_list_resources(request_id, _params) do
+    def handle_list_resources(_conn, request_id, _params) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{resources: []}}}
     end
 
     @impl true
-    def handle_read_resource(request_id, _params) do
+    def handle_read_resource(_conn, request_id, _params) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{contents: []}}}
     end
 
     @impl true
-    def handle_list_tools(request_id, _params) do
+    def handle_list_tools(_conn, request_id, _params) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{tools: []}}}
     end
 
     @impl true
-    def handle_call_tool(request_id, _params) do
+    def handle_call_tool(_conn, request_id, _params) do
       {:ok, %{jsonrpc: "2.0", id: request_id, result: %{content: []}}}
     end
   end
@@ -74,7 +74,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, nil} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, nil} = MCP.MessageRouter.handle_message(%{}, message)
     end
 
     test "handles ping request" do
@@ -84,7 +84,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "123"
@@ -101,7 +101,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "456"
@@ -116,7 +116,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "789"
@@ -131,7 +131,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "789"
@@ -148,7 +148,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "789"
@@ -163,7 +163,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "789"
@@ -180,7 +180,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "789"
@@ -195,7 +195,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "789"
@@ -212,7 +212,7 @@ defmodule MCP.MessageRouterTest do
         "jsonrpc" => "2.0"
       }
 
-      assert {:ok, response} = MCP.MessageRouter.handle_message(message)
+      assert {:ok, response} = MCP.MessageRouter.handle_message(%{}, message)
       assert JsonRpcSchema.valid?(JsonRpcSchema.result_schema(), response)
 
       assert response.id == "101"
@@ -228,7 +228,7 @@ defmodule MCP.MessageRouterTest do
 
       log =
         capture_log(fn ->
-          assert {:error, response} = MCP.MessageRouter.handle_message(message)
+          assert {:error, response} = MCP.MessageRouter.handle_message(%{}, message)
           assert JsonRpcSchema.valid?(JsonRpcSchema.error_schema(), response)
 
           assert response.id == "999"
@@ -247,7 +247,7 @@ defmodule MCP.MessageRouterTest do
 
       log =
         capture_log(fn ->
-          assert {:error, response} = MCP.MessageRouter.handle_message(message)
+          assert {:error, response} = MCP.MessageRouter.handle_message(%{}, message)
           assert JsonRpcSchema.valid?(JsonRpcSchema.error_schema(), response)
 
           assert response.id == nil

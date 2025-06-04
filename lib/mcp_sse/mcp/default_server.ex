@@ -10,7 +10,7 @@ defmodule MCP.DefaultServer do
   @protocol_version "2024-11-05"
 
   @impl true
-  def handle_ping(request_id) do
+  def handle_ping(_conn, request_id) do
     {:ok,
      %{
        jsonrpc: "2.0",
@@ -20,7 +20,7 @@ defmodule MCP.DefaultServer do
   end
 
   @impl true
-  def handle_initialize(request_id, params) do
+  def handle_initialize(_conn, request_id, params) do
     Logger.info("Client initialization params: #{inspect(params, pretty: true)}")
 
     case validate_protocol_version(params["protocolVersion"]) do
@@ -50,7 +50,7 @@ defmodule MCP.DefaultServer do
   end
 
   @impl true
-  def handle_list_tools(request_id, _params) do
+  def handle_list_tools(_conn, request_id, _params) do
     {:ok,
      %{
        jsonrpc: "2.0",
@@ -88,6 +88,7 @@ defmodule MCP.DefaultServer do
 
   @impl true
   def handle_call_tool(
+        _conn,
         request_id,
         %{"name" => "upcase", "arguments" => %{"text" => text}} = params
       ) do
@@ -108,7 +109,7 @@ defmodule MCP.DefaultServer do
      }}
   end
 
-  def handle_call_tool(request_id, %{"name" => unknown_tool} = params) do
+  def handle_call_tool(_conn, request_id, %{"name" => unknown_tool} = params) do
     Logger.warning("Unknown tool called: #{unknown_tool} with params: #{inspect(params)}")
 
     {:error,
