@@ -188,6 +188,7 @@ defmodule SSE.ConnectionPlug do
     |> put_resp_header("cache-control", "no-cache")
     |> put_resp_header("connection", "keep-alive")
     |> put_resp_header("content-type", "text/event-stream; charset=utf-8")
+    |> put_resp_header("transfer-encoding", "chunked")
     |> send_chunked(200)
   end
 
