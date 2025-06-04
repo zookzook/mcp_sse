@@ -203,7 +203,13 @@ defmodule SSE.ConnectionPlug do
 
   defp send_initial_message(conn, session_id) do
     endpoint =
-      "#{conn.scheme}://#{conn.host}:#{conn.port}#{@message_path}?sessionId=#{session_id}"
+      case Application.get_env(:mcp_sse, :url, nil) do
+        nil ->
+          "#{conn.scheme}://#{conn.host}:#{conn.port}#{@message_path}?sessionId=#{session_id}"
+
+        url ->
+          "#{Keyword.get(url, :scheme)}://#{Keyword.get(url, :host)}:#{Keyword.get(url, :port)}#{@message_path}?sessionId=#{session_id}"
+      end
 
     case chunk(conn, "event: endpoint\ndata: #{endpoint}\n\n") do
       {:ok, conn} -> conn
