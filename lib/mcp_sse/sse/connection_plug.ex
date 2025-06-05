@@ -185,7 +185,7 @@ defmodule SSE.ConnectionPlug do
 
   defp setup_sse_connection(conn) do
     conn
-    |> put_resp_header("cache-control", "no-cache")
+    |> put_resp_header("cache-control", "no-cache, no-transform")
     |> put_resp_header("connection", "keep-alive")
     |> put_resp_header("content-type", "text/event-stream; charset=utf-8")
     |> put_resp_header("x-accel-buffering", "no")
